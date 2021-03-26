@@ -184,7 +184,7 @@ function ldl_numeric_upper!(n, Ap, Ai, Ax, Cp, Ci, Lp, parent, Lnz, Li, Lx, D, Y
       i = pattern[top]
       yi = Y[i]
       Y[i] = 0
-      @inbounds for p = Lp[i] : (Lp[i] + Lnz[i] - 1)
+      @inbounds @simd for p = Lp[i] : (Lp[i] + Lnz[i] - 1)
         Y[Li[p]] -= Lx[p] * yi
       end
       p = Lp[i] + Lnz[i]
@@ -255,7 +255,7 @@ end
 function ldl_lsolve!(n, x::AbstractVector, Lp, Li, Lx)
   @inbounds for j = 1:n
     xj = x[j]
-    @inbounds for p = Lp[j] : (Lp[j+1] - 1)
+    @inbounds @simd for p = Lp[j] : (Lp[j+1] - 1)
       x[Li[p]] -= Lx[p] * xj
     end
   end
@@ -263,7 +263,7 @@ function ldl_lsolve!(n, x::AbstractVector, Lp, Li, Lx)
 end
 
 function ldl_dsolve!(n, x::AbstractVector, D)
-  @inbounds for j = 1:n
+  @inbounds @simd for j = 1:n
     x[j] /= D[j]
   end
   return x
@@ -272,7 +272,7 @@ end
 function ldl_ltsolve!(n, x::AbstractVector, Lp, Li, Lx)
   @inbounds for j = n:-1:1
     xj = x[j]
-    @inbounds for p = Lp[j] : (Lp[j+1] - 1)
+    @inbounds @simd for p = Lp[j] : (Lp[j+1] - 1)
       xj -= Lx[p] * x[Li[p]]
     end
     x[j] = xj
